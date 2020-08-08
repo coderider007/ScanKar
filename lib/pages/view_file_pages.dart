@@ -59,9 +59,7 @@ class _ViewFilePagesState extends State<ViewFilePages> {
       body: allFiles != null && allFiles.length > 0
           ? ReorderableListView(
               onReorder: (int oldIndex, int newIndex) {
-                setState(() {
-                  _updateListItems(oldIndex, newIndex);
-                });
+                _updateListItems(oldIndex, newIndex);
               },
               children: List.generate(
                 allFiles.length,
@@ -136,7 +134,7 @@ class _ViewFilePagesState extends State<ViewFilePages> {
     );
   }
 
-  void _updateListItems(int oldIndex, int newIndex) {
+  void _updateListItems(int oldIndex, int newIndex) async {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
@@ -147,5 +145,10 @@ class _ViewFilePagesState extends State<ViewFilePages> {
     final FileDetails item = allFiles.removeAt(oldIndex);
     allFiles.insert(newIndex, item);
     // _fileStorageService.swapFileNames(atOldIndex, atNewIndex);
+    _fileStorageService.renameFiles(allFiles.map((e) => e.file).toList());
+
+    setState(() {
+      allFiles = allFiles;
+    });
   }
 }

@@ -103,6 +103,21 @@ class FileStorageService {
     temp.renameSync(fileName2);
   }
 
+  Future<void> renameFiles(List<File> files) async {
+    List<File> tempFiles = List();
+    for (int i = 0; i < files.length; i++) {
+      File oldFile = files[i];
+      File tempFile = oldFile.renameSync(
+          path.dirname(oldFile.path) + '/' + (i + 1).toString() + '-temp.jpeg');
+      tempFiles.add(tempFile);
+    }
+    for (int i = 0; i < tempFiles.length; i++) {
+      File tempFile = tempFiles[i];
+      tempFile.renameSync(
+          path.dirname(tempFile.path) + '/' + (i + 1).toString() + '.jpeg');
+    }
+  }
+
   // Future<void> renameFileFrom(List<File> files, int index) async {
   //   for (int i = 0; i < files.length - 1; i++) {
   //     if (i < index) continue;
