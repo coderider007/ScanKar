@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:ScanKar/custom/custom_list_tile.dart';
+import 'package:ScanKar/services/pdf_generator.dart';
+
 import '../constants.dart';
 import '../data/file_details.dart';
 import '../custom/custom_drawer.dart';
@@ -17,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<List<FileDetails>> allFiles;
   FileStorageService _fileStorageService = FileStorageService.instance;
+  PdfGeneratorService _pdfGeneratorService = PdfGeneratorService.instance;
 
   @override
   void initState() {
@@ -26,6 +30,15 @@ class _HomePageState extends State<HomePage> {
 
   void delteDirectory(Directory directory) {
     _fileStorageService.deleteDir(directory).then((value) => {
+          setState(() {
+            allFiles = loadImageList();
+            showToast("Not implemented...", gravity: Toast.BOTTOM);
+          })
+        });
+  }
+
+  void renameDirectory(Directory directory, String name) {
+    _fileStorageService.renameDir(directory, name).then((value) => {
           setState(() {
             allFiles = loadImageList();
             showToast("Not implemented...", gravity: Toast.BOTTOM);
@@ -77,61 +90,38 @@ class _HomePageState extends State<HomePage> {
                     FileDetails fileDetails = projectSnap.data[index];
                     return Container(
                       padding: EdgeInsets.all(10),
-                      child: Card(
-                        child: Column(
+                      child: GestureDetector(
+                        onLongPress: () {
+                          showFileOptionsDialog(context, fileDetails);
+                        },
+                        child: Stack(
                           children: <Widget>[
-                            ListTile(
-                              leading: Image.file(
-                                fileDetails.file,
-                                // width: MediaQuery.of(context).size.width / 2,
-                                width: 50.0,
-                                height: 80.0,
-                                fit: BoxFit.fill,
+                            Card(
+                              child: ListTile(
+                                leading: Image.file(
+                                  fileDetails.file,
+                                  // width: MediaQuery.of(context).size.width / 2,
+                                  width: 50.0,
+                                  height: 80.0,
+                                  fit: BoxFit.fill,
+                                ),
+                                title: Text(fileDetails.name),
+                                subtitle: Text('Last modified at ' +
+                                    fileDetails.modified.toString()),
                               ),
-                              title: Text(fileDetails.name),
-                              subtitle: Text('Last modified at ' +
-                                  fileDetails.modified.toString()),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(Icons.share),
-                                    onPressed: () {
-                                      showToast("Not implemented...",
-                                          gravity: Toast.BOTTOM);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.picture_as_pdf),
-                                    onPressed: () {
-                                      showToast("Not implemented...",
-                                          gravity: Toast.BOTTOM);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      // Navigator.of(context).pop();
-                                      Navigator.pushNamed(
-                                        context,
-                                        Constants.ROUTE_PAGES_IN_FILE,
-                                        arguments: fileDetails.directory,
-                                      );
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {
-                                      delteDirectory(fileDetails.directory);
-                                    },
-                                  ),
-                                ],
+                            Positioned(
+                              top: 5,
+                              right: 0,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.more_vert,
+                                ),
+                                onPressed: () {
+                                  showFileOptionsDialog(context, fileDetails);
+                                },
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -160,6 +150,98 @@ class _HomePageState extends State<HomePage> {
         tooltip: 'Scan new document',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  showFileOptionsDialog(BuildContext context, FileDetails fileDetails) {
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      //title: Text("My title"),
+      content: Container(
+        width: 250,
+        height: 255,
+        child: Column(
+          children: <Widget>[
+            CustomListTile(Icons.share, "Share", () {
+              Navigator.of(context).pop();
+              showToast("Not implemented...", gravity: Toast.BOTTOM);
+            }),
+            CustomListTile(Icons.picture_as_pdf, "Download as PDF", () {
+              Navigator.of(context).pop();
+              _pdfGeneratorService.createPdf(context, fileDetails.directory);
+              showToast("Downloading to as PDF...",
+                  duration: 3, gravity: Toast.BOTTOM);
+            }),
+            CustomListTile(Icons.open_in_new, "Edit", () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(
+                context,
+                Constants.ROUTE_PAGES_IN_FILE,
+                arguments: fileDetails.directory,
+              );
+            }),
+            CustomListTile(Icons.edit, "Rename", () {
+              Navigator.of(context).pop();
+              showFileRenameDialog(context, fileDetails);
+            }),
+            CustomListTile(Icons.delete, "Delete", () {
+              Navigator.of(context).pop();
+              delteDirectory(fileDetails.directory);
+            }),
+          ],
+        ),
+      ),
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  showFileRenameDialog(BuildContext context, FileDetails fileDetails) {
+    final fileNameController = TextEditingController(text: fileDetails.name);
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text('Rename File'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            TextField(
+              controller: fileNameController,
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            fileNameController.dispose();
+          },
+        ),
+        FlatButton(
+          child: Text('OK'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            _fileStorageService.renameDir(
+                fileDetails.directory, fileNameController.text);
+            showToast('Renamed');
+          },
+        ),
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 

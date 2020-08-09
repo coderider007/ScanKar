@@ -38,6 +38,9 @@ dependencies:
   path_provider: ^1.6.11
   intl: ^0.16.1
   toast: ^0.1.5
+  images_to_pdf: ^0.0.1
+  printing: ^3.5.0
+  downloads_path_provider: ^0.1.0
 
 dev_dependencies:
   flutter_test:

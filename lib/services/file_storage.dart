@@ -10,12 +10,17 @@ class FileStorageService {
   FileStorageService._privateConstructor();
 
   Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
+    Directory directory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
     return directory.path;
   }
 
   Future<Directory> getDirectory() async {
-    return await getApplicationDocumentsDirectory();
+    Directory directory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+    return directory;
   }
 
   Future<List<Directory>> getSubDirs(Directory directory) async {
@@ -28,6 +33,19 @@ class FileStorageService {
 
   Future<void> deleteDir(Directory directory) async {
     return directory.deleteSync();
+  }
+
+  Future<void> renameDir(Directory directory, String name) async {
+    var files = await getAllFilesFromDir(directory);
+    files.forEach((file) {
+      File newFile = File(path.join(file.parent.parent.path, name) +
+          '/' +
+          path.basename(file.path));
+      newFile.createSync(recursive: true);
+      file.renameSync(newFile.path);
+    });
+    directory.deleteSync(recursive: true);
+    // return directory.renameSync(path.join(path.basename(directory.path), name));
   }
 
   Future<void> deleteFile(File file) async {

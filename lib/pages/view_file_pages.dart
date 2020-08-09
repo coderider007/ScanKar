@@ -57,73 +57,79 @@ class _ViewFilePagesState extends State<ViewFilePages> {
       ),
       drawer: CustomDrawer(),
       body: allFiles != null && allFiles.length > 0
-          ? ReorderableListView(
-              onReorder: (int oldIndex, int newIndex) {
-                _updateListItems(oldIndex, newIndex);
-              },
-              children: List.generate(
-                allFiles.length,
-                (index) {
-                  FileDetails fileDetails = allFiles[index];
-                  return Container(
-                    key: ValueKey("value$index"),
-                    padding: EdgeInsets.fromLTRB(50, 20, 50, 10),
-                    child: Card(
-                      shadowColor: Colors.grey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          // Padding(
-                          //   padding: const EdgeInsets.all(8.0),
-                          //   child: Text(
-                          //     (index + 1).toString(),
-                          //     textAlign: TextAlign.left,
-                          //   ),
-                          // ),
-                          Padding(
-                            padding: const EdgeInsets.all(0),
-                            child: Image.file(
-                              fileDetails.file,
-                              // width: MediaQuery.of(context).size.width / 2,
-                              width: 300.0,
-                              height: 380.0,
-                              fit: BoxFit.fill,
+          ? Center(
+              child: Container(
+                // height: 300,
+                width: 200,
+                // padding: EdgeInsets.all(8),
+                child: ReorderableListView(
+                  onReorder: (int oldIndex, int newIndex) {
+                    _updateListItems(oldIndex, newIndex);
+                  },
+                  children: List.generate(
+                    allFiles.length,
+                    (index) {
+                      FileDetails fileDetails = allFiles[index];
+                      return Card(
+                        margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        key: ValueKey("value$index"),
+                        shadowColor: Colors.grey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            // Padding(
+                            //   padding: const EdgeInsets.all(8.0),
+                            //   child: Text(
+                            //     (index + 1).toString(),
+                            //     textAlign: TextAlign.left,
+                            //   ),
+                            // ),
+                            Padding(
+                              padding: const EdgeInsets.all(0),
+                              child: Image.file(
+                                fileDetails.file,
+                                // width: MediaQuery.of(context).size.width / 2,
+                                width: 150.0,
+                                height: 180.0,
+                                fit: BoxFit.fill,
+                              ),
                             ),
-                          ),
-                          // Padding(
-                          //   padding: const EdgeInsets.all(8.0),
-                          //   child: Text(fileDetails.name),
-                          // ),
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                // Icon(Icons.share),
-                                // Icon(Icons.file_download),
-                                // Icon(Icons.edit),
-                                // Text(fileDetails.name),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Text(
-                                    'Page ' + (index + 1).toString(),
-                                    textAlign: TextAlign.right,
+                            // Padding(
+                            //   padding: const EdgeInsets.all(8.0),
+                            //   child: Text(fileDetails.name),
+                            // ),
+                            Padding(
+                              padding: const EdgeInsets.all(2.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  // Icon(Icons.share),
+                                  // Icon(Icons.file_download),
+                                  // Icon(Icons.edit),
+                                  // Text(fileDetails.name),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child: Text(
+                                      'Page ' + (index + 1).toString(),
+                                      textAlign: TextAlign.right,
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete),
-                                  onPressed: () {
-                                    deleteFile(fileDetails.file);
-                                  },
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      deleteFile(fileDetails.file);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             )
           : Container(
