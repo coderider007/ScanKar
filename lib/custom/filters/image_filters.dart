@@ -10,14 +10,14 @@ import 'package:photofilters/utils/color_filter_utils.dart'
     as color_filter_utils;
 
 class MyBrightnessFilter extends ColorFilter {
-  MyBrightnessFilter() : super(name: "EnhanceColors") {
+  MyBrightnessFilter() : super(name: "Enhance Colors") {
     this.addSubFilter(BrightnessSubFilter(0.3));
     //this.addSubFilter(HueRotationSubFilter(30));
   }
 }
 
 class MyGreyscaleFilter extends ColorFilter {
-  MyGreyscaleFilter() : super(name: "GreyScale") {
+  MyGreyscaleFilter() : super(name: "Grey Scale") {
     this.addSubFilter(MyGreyScaleSubFilter());
     this.addSubFilter(HueRotationSubFilter(30));
   }

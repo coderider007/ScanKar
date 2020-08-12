@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:ScanKar/services/file_storage.dart';
-import 'package:downloads_path_provider/downloads_path_provider.dart';
+import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:images_to_pdf/images_to_pdf.dart';
@@ -25,8 +25,19 @@ class PdfGeneratorService {
       // Platform messages may fail, so we use a try/catch PlatformException.
       try {
         if (await Permission.storage.request().isGranted) {
-          showToast(context, 'Permissions Granted!');
-          downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
+          // showToast(context, 'Permissions Granted!');
+          if (Platform.isAndroid) {
+            var extDir = await ExtStorage.getExternalStoragePublicDirectory(
+                ExtStorage.DIRECTORY_DOWNLOADS);
+            downloadsDirectory = Directory(extDir);
+            // dir = (await getExternalStorageDirectory()).path;
+          } else if (Platform.isIOS) {
+            downloadsDirectory = await getApplicationDocumentsDirectory();
+          }
+
+          // downloadsDirectory.createSync(recursive: true);
+          // downloadsDirectory = await DownloadsPathProvider.downloadsDirectory;
+          // downloadsDirectory = await getExternalStorageDirectory();
         } else if (await Permission.speech.isPermanentlyDenied) {
           // The user opted to never again see the permission request dialog for this
           // app. The only way to change the permission's status now is to let the

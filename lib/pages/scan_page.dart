@@ -1,25 +1,22 @@
-import 'package:ScanKar/custom/filters/image_filters.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-import '../constants.dart';
-import '../custom/custom_drawer.dart';
-import '../services/file_storage.dart';
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:flutter/material.dart';
 import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:image_crop/image_crop.dart';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:photofilters/photofilters.dart';
 import 'package:image/image.dart' as imageLib;
 import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
+
+import '../constants.dart';
+import '../custom/custom_drawer.dart';
+import '../services/file_storage.dart';
 
 class ScanPage extends StatefulWidget {
   const ScanPage({Key key}) : super(key: key);
@@ -35,16 +32,30 @@ final FileStorageService _fileStorageService = FileStorageService.instance;
 
 class _ScanPageState extends State<ScanPage> {
   final cropKey = GlobalKey<CropState>();
+  ImageSource currentImageSource;
   List<Uint8List> filesInAlbum = List();
   File imageFile;
   AppState state;
-  ImageSource currentImageSource;
-  var flt = presetFiltersList;
+
+  // List<Filter> _defaultFiltersList = presetFiltersList;
   List<Filter> _defaultFiltersList = [
     NoFilter(),
     InkwellFilter(),
-    MyBrightnessFilter(),
-    MyGreyscaleFilter()
+    BrannanFilter(),
+    MoonFilter(),
+    XProIIFilter(),
+    AddictiveBlueFilter(),
+    AddictiveRedFilter(),
+    AmaroFilter(),
+    GinghamFilter(),
+    GinzaFilter(),
+    HudsonFilter(),
+    LarkFilter(),
+    LoFiFilter(),
+    SlumberFilter(),
+    StinsonFilter(),
+    //MyBrightnessFilter(),
+    //MyGreyscaleFilter()
   ];
 
   @override
@@ -197,23 +208,24 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<Null> _pickImage(ImageSource imageSource) async {
+  Future<void> _pickImage(ImageSource imageSource) async {
+    File pickeImage;
     if (imageSource != null) {
       if (imageSource == ImageSource.gallery) {
         //imageFile = await ImagePicker.pickImage(source: imageSource);
         ImagePicker _imagePicker = new ImagePicker();
         PickedFile pikedFile = await _imagePicker.getImage(source: imageSource);
-        if (pikedFile != null) imageFile = File(pikedFile.path);
+        if (pikedFile != null) pickeImage = File(pikedFile.path);
       } else if (imageSource == ImageSource.camera) {
         // Platform messages may fail, so we use a try/catch PlatformException.
         try {
-          if (await Permission.camera.request().isGranted) {
-            String imagePath = await EdgeDetection.detectEdge;
-            print("image path = " + imagePath);
-            imageFile = File(imagePath);
-          } else if (await Permission.speech.isPermanentlyDenied) {
-            openAppSettings();
-          }
+          //if (await Permission.camera.request().isGranted) {
+          String imagePath = await EdgeDetection.detectEdge;
+          print("image path = " + imagePath);
+          pickeImage = File(imagePath);
+          // } else if (await Permission.speech.isPermanentlyDenied) {
+          //   openAppSettings();
+          // }
         } on PlatformException {}
 
         // If the widget was removed from the tree while the asynchronous platform
@@ -225,11 +237,22 @@ class _ScanPageState extends State<ScanPage> {
       showToast('Image Source can not be NULL');
     }
 
-    if (imageFile != null) {
-      setState(() {
-        state = AppState.picked;
-        currentImageSource = imageSource;
-      });
+    if (pickeImage != null) {
+      imageFile = pickeImage;
+      if (imageSource == ImageSource.camera) {
+        await _editImage();
+        setState(() {
+          // imageFile = pickeImage;
+          // state = AppState.edited;
+          currentImageSource = imageSource;
+        });
+      } else {
+        setState(() {
+          imageFile = pickeImage;
+          state = AppState.picked;
+          currentImageSource = imageSource;
+        });
+      }
     }
   }
 
@@ -262,22 +285,27 @@ class _ScanPageState extends State<ScanPage> {
 
     if (croppedFile != null) {
       imageFile = croppedFile;
-      setState(() {
-        state = AppState.cropped;
-      });
+      await _editImage();
+      // setState(() {
+      //   state = AppState.cropped;
+      // });
     }
   }
 
-  void _editImage() async {
+  Future<void> _editImage() async {
     Map imagefile = await Navigator.push(
       context,
       new MaterialPageRoute(
         builder: (context) => new PhotoFilterSelector(
-          title: Text("Apply Filter"),
+          appBarColor: Colors.deepOrange,
+          title: Text("ScanKar - Filter"),
           image: imageLib.decodeImage(imageFile.readAsBytesSync()),
           filters: _defaultFiltersList,
-          filename: imageFile.path,
-          loader: Center(child: CircularProgressIndicator()),
+          filename: _fileStorageService.getFileName(imageFile.path),
+          loader: Center(
+              child: CircularProgressIndicator(
+            backgroundColor: Colors.deepOrange,
+          )),
           fit: BoxFit.contain,
         ),
       ),
@@ -318,6 +346,8 @@ class _ScanPageState extends State<ScanPage> {
       imageFile = null;
       filesInAlbum.clear();
       state = AppState.saved;
+      Navigator.of(context).pop();
+      Navigator.of(context).pushNamed(Constants.ROUTE_HOME);
     });
     showToast("Saved", gravity: Toast.BOTTOM);
   }

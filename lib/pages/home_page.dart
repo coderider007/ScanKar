@@ -1,15 +1,16 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
+import 'package:toast/toast.dart';
 import 'package:ScanKar/custom/custom_list_tile.dart';
 import 'package:ScanKar/services/pdf_generator.dart';
+import 'package:intl/intl.dart';
 
 import '../constants.dart';
 import '../data/file_details.dart';
 import '../custom/custom_drawer.dart';
 import '../services/file_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_share/flutter_share.dart';
-import 'package:toast/toast.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key key}) : super(key: key);
@@ -65,12 +66,6 @@ class _HomePageState extends State<HomePage> {
     }
 
     return tempAllFiles;
-
-    // if (tempAllFiles.length > 0) {
-    //   setState(() {
-    //     allFiles = tempAllFiles;
-    //   });
-    // }
   }
 
   showFileOptionsDialog(BuildContext context, FileDetails fileDetails) {
@@ -224,8 +219,10 @@ class _HomePageState extends State<HomePage> {
                                   fit: BoxFit.fill,
                                 ),
                                 title: Text(fileDetails.name),
-                                subtitle: Text('Last modified at ' +
-                                    fileDetails.modified.toString()),
+                                subtitle: Text('Create on : ' +
+                                    DateFormat.yMMMd()
+                                        .add_jms()
+                                        .format(fileDetails.modified)),
                               ),
                             ),
                             Positioned(
