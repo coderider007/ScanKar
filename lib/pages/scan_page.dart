@@ -1,3 +1,4 @@
+import 'package:ScanKar/custom/filters/image_filters.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../constants.dart';
@@ -15,8 +16,8 @@ import 'package:flutter/services.dart';
 import 'package:image_crop/image_crop.dart';
 
 import 'package:image_picker/image_picker.dart';
-// import 'package:photofilters/photofilters.dart';
-// import 'package:image/image.dart' as imageLib;
+import 'package:photofilters/photofilters.dart';
+import 'package:image/image.dart' as imageLib;
 import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
 
@@ -27,8 +28,8 @@ class ScanPage extends StatefulWidget {
   _ScanPageState createState() => _ScanPageState();
 }
 
-enum AppState { ready, picked, cropped, /*edited,*/ addmore, saved }
-enum AppAction { pick_gallery, pick_camera, crop, /*edit,*/ addmore, done }
+enum AppState { ready, picked, cropped, edited, saved }
+enum AppAction { pick_gallery, pick_camera, crop, edit, addmore, done }
 final GlobalKey _globalKey = GlobalKey<CropState>();
 final FileStorageService _fileStorageService = FileStorageService.instance;
 
@@ -38,6 +39,13 @@ class _ScanPageState extends State<ScanPage> {
   File imageFile;
   AppState state;
   ImageSource currentImageSource;
+  var flt = presetFiltersList;
+  List<Filter> _defaultFiltersList = [
+    NoFilter(),
+    InkwellFilter(),
+    MyBrightnessFilter(),
+    MyGreyscaleFilter()
+  ];
 
   @override
   void initState() {
@@ -67,6 +75,14 @@ class _ScanPageState extends State<ScanPage> {
         }
         break;
       case AppState.cropped:
+        if (appAction == AppAction.edit) {
+          _editImage();
+        } else {
+          showToast("Unknow state and action combination",
+              gravity: Toast.BOTTOM);
+        }
+        break;
+      case AppState.edited:
         if (appAction == AppAction.addmore) {
           _addImage();
           _pickImage(currentImageSource);
@@ -132,6 +148,16 @@ class _ScanPageState extends State<ScanPage> {
           )
         ];
       case AppState.cropped:
+        return [
+          FloatingActionButton(
+            backgroundColor: Colors.deepOrange,
+            onPressed: () {
+              buttonOnPress(AppAction.edit);
+            },
+            child: Icon(Icons.edit),
+          )
+        ];
+      case AppState.edited:
         return [
           FloatingActionButton(
             backgroundColor: Colors.deepOrange,
@@ -242,30 +268,28 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-// XXXXX: DON'T DELETE
-
-  // void _editImage() async {
-  //   Map imagefile = await Navigator.push(
-  //     context,
-  //     new MaterialPageRoute(
-  //       builder: (context) => new PhotoFilterSelector(
-  //         title: Text("Apply Filter"),
-  //         image: imageLib.decodeImage(imageFile.readAsBytesSync()),
-  //         filters: presetFiltersList,
-  //         filename: imageFile.path,
-  //         loader: Center(child: CircularProgressIndicator()),
-  //         fit: BoxFit.contain,
-  //       ),
-  //     ),
-  //   );
-  //   if (imagefile != null && imagefile.containsKey('image_filtered')) {
-  //     imageFile = imagefile['image_filtered'];
-  //     setState(() {
-  //       state = AppState.edited;
-  //     });
-  //     print(imageFile.path);
-  //   }
-  // }
+  void _editImage() async {
+    Map imagefile = await Navigator.push(
+      context,
+      new MaterialPageRoute(
+        builder: (context) => new PhotoFilterSelector(
+          title: Text("Apply Filter"),
+          image: imageLib.decodeImage(imageFile.readAsBytesSync()),
+          filters: _defaultFiltersList,
+          filename: imageFile.path,
+          loader: Center(child: CircularProgressIndicator()),
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+    if (imagefile != null && imagefile.containsKey('image_filtered')) {
+      setState(() {
+        imageFile = imagefile['image_filtered'];
+        state = AppState.edited;
+      });
+      print(imageFile.path);
+    }
+  }
 
   Future<void> _addImage() async {
     RenderRepaintBoundary boundary =
