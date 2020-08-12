@@ -82,6 +82,14 @@ class _HomePageState extends State<HomePage> {
         height: 255,
         child: Column(
           children: <Widget>[
+            CustomListTile(Icons.open_in_new, "Open", () {
+              Navigator.of(context).pop();
+              Navigator.pushNamed(
+                context,
+                Constants.ROUTE_PAGES_IN_FILE,
+                arguments: fileDetails.directory,
+              );
+            }),
             CustomListTile(Icons.share, "Share", () {
               Navigator.of(context).pop();
               _shareFile(context, fileDetails.directory);
@@ -92,14 +100,6 @@ class _HomePageState extends State<HomePage> {
               _pdfGeneratorService.createPdf(context, fileDetails.directory);
               showToast("Downloaded as PDF...",
                   duration: 3, gravity: Toast.BOTTOM);
-            }),
-            CustomListTile(Icons.open_in_new, "Edit", () {
-              Navigator.of(context).pop();
-              Navigator.pushNamed(
-                context,
-                Constants.ROUTE_PAGES_IN_FILE,
-                arguments: fileDetails.directory,
-              );
             }),
             CustomListTile(Icons.edit, "Rename", () {
               Navigator.of(context).pop();
@@ -152,6 +152,9 @@ class _HomePageState extends State<HomePage> {
             _fileStorageService.renameDir(
                 fileDetails.directory, fileNameController.text);
             showToast('Renamed');
+            setState(() {
+              allFiles = loadImageList();
+            });
           },
         ),
       ],
@@ -168,6 +171,15 @@ class _HomePageState extends State<HomePage> {
 
   void showToast(String msg, {int duration, int gravity}) {
     Toast.show(msg, context, duration: duration, gravity: gravity);
+  }
+
+  void _shareFile(BuildContext context, Directory directory) async {
+    File file = await _pdfGeneratorService.createPdf(context, directory);
+    await FlutterShare.shareFile(
+      title: 'Share',
+      text: 'Share PDF to ',
+      filePath: file.path,
+    );
   }
 
   @override
@@ -192,6 +204,13 @@ class _HomePageState extends State<HomePage> {
                       child: GestureDetector(
                         onLongPress: () {
                           showFileOptionsDialog(context, fileDetails);
+                        },
+                        onDoubleTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            Constants.ROUTE_PAGES_IN_FILE,
+                            arguments: fileDetails.directory,
+                          );
                         },
                         child: Stack(
                           children: <Widget>[
@@ -249,15 +268,6 @@ class _HomePageState extends State<HomePage> {
         tooltip: 'Scan new document',
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  void _shareFile(BuildContext context, Directory directory) async {
-    File file = await _pdfGeneratorService.createPdf(context, directory);
-    await FlutterShare.shareFile(
-      title: 'Share',
-      text: 'Share PDF to ',
-      filePath: file.path,
     );
   }
 }

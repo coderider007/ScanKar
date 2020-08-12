@@ -93,41 +93,6 @@ class _ScanPageState extends State<ScanPage> {
       default:
         showToast("Unknow state", gravity: Toast.BOTTOM);
     }
-    // if (state == AppState.ready) {
-    //   if (appAction == AppAction.pick_camera) {
-    //     _pickImage(ImageSource.camera);
-    //   } else if (appAction == AppAction.pick_gallery) {
-    //     _pickImage(ImageSource.gallery);
-    //   } else {
-    //     showToast("Unknow state and action combination", gravity: Toast.BOTTOM);
-    //   }
-    // } else if (state == AppState.picked) {
-    //   if (appAction == AppAction.crop) {
-    //     _cropImage();
-    //   } else {
-    //     showToast("Unknow state and action combination", gravity: Toast.BOTTOM);
-    //   }
-    // } else if (state == AppState.cropped) {
-    //   if (appAction == AppAction.addmore) {
-    //     _addImage();
-    //     setState(() {
-    //       state = AppState.ready;
-    //     });
-    //   } else if (appAction == AppAction.done) {
-    //     _addImage();
-    //     _saveAllImages();
-    //   } else {
-    //     showToast("Unknow state and action combination", gravity: Toast.BOTTOM);
-    //   }
-    // } else if (state == AppState.saved) {
-    //   if (appAction == AppAction.done) {
-    //     _clearImage();
-    //   } else {
-    //     showToast("Unknow state and action combination", gravity: Toast.BOTTOM);
-    //   }
-    // } else {
-    //   showToast("Unknow state", gravity: Toast.BOTTOM);
-    // }
   }
 
   List<Widget> _buildButtons() {
@@ -190,30 +155,6 @@ class _ScanPageState extends State<ScanPage> {
             ),
           ),
         ];
-      // case AppState.addmore:
-      //   return currentImageSource == ImageSource.camera
-      //       ? [
-      //           FloatingActionButton(
-      //             backgroundColor: Colors.deepOrange,
-      //             onPressed: () {
-      //               buttonOnPress(AppAction.pick_camera);
-      //             },
-      //             heroTag: 'imagePickFromCamera',
-      //             tooltip: 'Take a Photo',
-      //             child: const Icon(Icons.camera),
-      //           )
-      //         ]
-      //       : [
-      //           FloatingActionButton(
-      //             backgroundColor: Colors.deepOrange,
-      //             onPressed: () {
-      //               buttonOnPress(AppAction.pick_gallery);
-      //             },
-      //             heroTag: 'imagePickFromGalary',
-      //             tooltip: 'Pick Image from gallery',
-      //             child: const Icon(Icons.photo_library),
-      //           )
-      //         ];
       case AppState.saved:
         return [
           FloatingActionButton(
@@ -227,76 +168,6 @@ class _ScanPageState extends State<ScanPage> {
       default:
         return [Container()];
     }
-    // if (state == AppState.ready)
-    //   return [
-    //     FloatingActionButton(
-    //       backgroundColor: Colors.deepOrange,
-    //       onPressed: () {
-    //         buttonOnPress(AppAction.pick_gallery);
-    //       },
-    //       heroTag: 'imagePickFromGalary',
-    //       tooltip: 'Pick Image from gallery',
-    //       child: const Icon(Icons.photo_library),
-    //     ),
-    //     Padding(
-    //       padding: const EdgeInsets.only(top: 16.0),
-    //       child: FloatingActionButton(
-    //         backgroundColor: Colors.deepOrange,
-    //         onPressed: () {
-    //           buttonOnPress(AppAction.pick_camera);
-    //         },
-    //         heroTag: 'imagePickFromCamera',
-    //         tooltip: 'Take a Photo',
-    //         child: const Icon(Icons.camera),
-    //       ),
-    //     )
-    //   ];
-    // else if (state == AppState.picked)
-    //   return [
-    //     FloatingActionButton(
-    //       backgroundColor: Colors.deepOrange,
-    //       onPressed: () {
-    //         buttonOnPress(AppAction.crop);
-    //       },
-    //       child: Icon(Icons.crop),
-    //     )
-    //   ];
-    // else if (state == AppState.cropped)
-    //   return [
-    //     FloatingActionButton(
-    //       backgroundColor: Colors.deepOrange,
-    //       onPressed: () {
-    //         buttonOnPress(AppAction.done);
-    //       },
-    //       heroTag: 'imageDone',
-    //       tooltip: 'Done',
-    //       child: const Icon(Icons.done),
-    //     ),
-    //     Padding(
-    //       padding: const EdgeInsets.only(top: 16.0),
-    //       child: FloatingActionButton(
-    //         backgroundColor: Colors.deepOrange,
-    //         onPressed: () {
-    //           buttonOnPress(AppAction.addmore);
-    //         },
-    //         heroTag: 'imageAddMore',
-    //         tooltip: 'Add More',
-    //         child: const Icon(Icons.add),
-    //       ),
-    //     ),
-    //   ];
-    // else if (state == AppState.saved)
-    //   return [
-    //     FloatingActionButton(
-    //       backgroundColor: Colors.deepOrange,
-    //       onPressed: () {
-    //         buttonOnPress(AppAction.done);
-    //       },
-    //       child: Icon(Icons.done_all),
-    //     )
-    //   ];
-    // else
-    //   return [Container()];
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.

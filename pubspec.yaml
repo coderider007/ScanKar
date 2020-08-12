@@ -31,7 +31,7 @@ dependencies:
   image_picker: ^0.6.7+4
   edge_detection: ^1.0.5
   image_crop: ^0.3.2
-  photofilters: ^1.0.6
+  photofilters: ^2.0.1
   image_gallery: ^1.2.0
   image_gallery_saver: ^1.5.0
   permission_handler: ^5.0.1+1
