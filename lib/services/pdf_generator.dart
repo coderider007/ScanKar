@@ -11,13 +11,15 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:toast/toast.dart';
 
 class PdfGeneratorService {
+  PdfGeneratorService._privateConstructor();
+
   static final PdfGeneratorService instance =
       PdfGeneratorService._privateConstructor();
-  PdfGeneratorService._privateConstructor();
 
   FileStorageService _fileStorageService = FileStorageService.instance;
 
-  Future<void> createPdf(BuildContext context, Directory filesDir) async {
+  Future<File> createPdf(BuildContext context, Directory filesDir) async {
+    File output;
     try {
       Directory downloadsDirectory;
       // Platform messages may fail, so we use a try/catch PlatformException.
@@ -44,15 +46,14 @@ class PdfGeneratorService {
 
       var fileName = path.basename(filesDir.path);
 
-      final output =
-          File(path.join(downloadsDirectory.path, fileName + '.pdf'));
+      output = File(path.join(downloadsDirectory.path, fileName + '.pdf'));
       print(output.toString());
       await ImagesToPdf.createPdf(
         pages: images
             .map(
               (file) => PdfPage(
                 imageFile: file,
-                size: Size(1920, 1080),
+                //size: Size(1920, 1080),
                 compressionQuality: 0.5,
               ),
             )
@@ -65,6 +66,8 @@ class PdfGeneratorService {
       print(_status);
       showToast(context, _status, duration: 3);
     } catch (e) {}
+
+    return output;
   }
 
   void showToast(context, String msg, {int duration, int gravity}) {

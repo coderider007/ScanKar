@@ -1,3 +1,5 @@
+import 'package:permission_handler/permission_handler.dart';
+
 import '../constants.dart';
 import '../custom/custom_drawer.dart';
 import '../services/file_storage.dart';
@@ -25,16 +27,17 @@ class ScanPage extends StatefulWidget {
   _ScanPageState createState() => _ScanPageState();
 }
 
-enum AppState { ready, picked, cropped, /*edited,*/ saved }
+enum AppState { ready, picked, cropped, /*edited,*/ addmore, saved }
 enum AppAction { pick_gallery, pick_camera, crop, /*edit,*/ addmore, done }
 final GlobalKey _globalKey = GlobalKey<CropState>();
 final FileStorageService _fileStorageService = FileStorageService.instance;
 
 class _ScanPageState extends State<ScanPage> {
   final cropKey = GlobalKey<CropState>();
-  AppState state;
   List<Uint8List> filesInAlbum = List();
   File imageFile;
+  AppState state;
+  ImageSource currentImageSource;
 
   @override
   void initState() {
@@ -42,33 +45,10 @@ class _ScanPageState extends State<ScanPage> {
     state = AppState.ready;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(Constants.appTitle),
-      ),
-      drawer: CustomDrawer(),
-      body: Center(
-        child: imageFile != null
-            ? RepaintBoundary(
-                key: _globalKey,
-                child: state == AppState.picked
-                    ? Crop.file(imageFile, key: cropKey)
-                    : Image.file(imageFile),
-              )
-            : Container(
-                child: Text('Click or Select image!'),
-              ),
-      ),
-      floatingActionButton: Column(
-          mainAxisAlignment: MainAxisAlignment.end, children: _buildButtons()),
-    );
-  }
-
   buttonOnPress(AppAction appAction) {
     switch (state) {
       case AppState.ready:
+        //case AppState.addmore:
         if (appAction == AppAction.pick_camera) {
           _pickImage(ImageSource.camera);
         } else if (appAction == AppAction.pick_gallery) {
@@ -89,11 +69,13 @@ class _ScanPageState extends State<ScanPage> {
       case AppState.cropped:
         if (appAction == AppAction.addmore) {
           _addImage();
-          setState(() {
-            state = AppState.ready;
-          });
+          _pickImage(currentImageSource);
+
+          // setState(() {
+          //   state = AppState.addmore;
+          // });
         } else if (appAction == AppAction.done) {
-          _addImage();
+          //_addImage();
           _saveAllImages();
         } else {
           showToast("Unknow state and action combination",
@@ -208,6 +190,30 @@ class _ScanPageState extends State<ScanPage> {
             ),
           ),
         ];
+      // case AppState.addmore:
+      //   return currentImageSource == ImageSource.camera
+      //       ? [
+      //           FloatingActionButton(
+      //             backgroundColor: Colors.deepOrange,
+      //             onPressed: () {
+      //               buttonOnPress(AppAction.pick_camera);
+      //             },
+      //             heroTag: 'imagePickFromCamera',
+      //             tooltip: 'Take a Photo',
+      //             child: const Icon(Icons.camera),
+      //           )
+      //         ]
+      //       : [
+      //           FloatingActionButton(
+      //             backgroundColor: Colors.deepOrange,
+      //             onPressed: () {
+      //               buttonOnPress(AppAction.pick_gallery);
+      //             },
+      //             heroTag: 'imagePickFromGalary',
+      //             tooltip: 'Pick Image from gallery',
+      //             child: const Icon(Icons.photo_library),
+      //           )
+      //         ];
       case AppState.saved:
         return [
           FloatingActionButton(
@@ -304,9 +310,13 @@ class _ScanPageState extends State<ScanPage> {
       } else if (imageSource == ImageSource.camera) {
         // Platform messages may fail, so we use a try/catch PlatformException.
         try {
-          String imagePath = await EdgeDetection.detectEdge;
-          print("image path = " + imagePath);
-          imageFile = File(imagePath);
+          if (await Permission.camera.request().isGranted) {
+            String imagePath = await EdgeDetection.detectEdge;
+            print("image path = " + imagePath);
+            imageFile = File(imagePath);
+          } else if (await Permission.speech.isPermanentlyDenied) {
+            openAppSettings();
+          }
         } on PlatformException {}
 
         // If the widget was removed from the tree while the asynchronous platform
@@ -314,11 +324,14 @@ class _ScanPageState extends State<ScanPage> {
         // setState to update our non-existent appearance.
         if (!mounted) return;
       }
+    } else {
+      showToast('Image Source can not be NULL');
     }
 
     if (imageFile != null) {
       setState(() {
         state = AppState.picked;
+        currentImageSource = imageSource;
       });
     }
   }
@@ -383,20 +396,24 @@ class _ScanPageState extends State<ScanPage> {
   //   }
   // }
 
-  void _addImage() async {
+  Future<void> _addImage() async {
     RenderRepaintBoundary boundary =
         _globalKey.currentContext.findRenderObject();
     ui.Image image = await boundary.toImage();
     ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List bytes = byteData.buffer.asUint8List();
-
     filesInAlbum.add(bytes);
-    imageFile = null;
+
+    setState(() {
+      this.filesInAlbum = filesInAlbum;
+      imageFile = null;
+    });
 
     showToast("Page added", gravity: Toast.BOTTOM);
   }
 
   void _saveAllImages() async {
+    await _addImage();
     var folderName = generateFolderName();
     for (int i = 0; i < filesInAlbum.length; i++) {
       await _fileStorageService.createFileToDir(
@@ -414,6 +431,7 @@ class _ScanPageState extends State<ScanPage> {
     imageFile = null;
     setState(() {
       state = AppState.ready;
+      currentImageSource = null;
     });
     showToast("Cleared", gravity: Toast.BOTTOM);
   }
@@ -425,5 +443,29 @@ class _ScanPageState extends State<ScanPage> {
 
   void showToast(String msg, {int duration, int gravity}) {
     Toast.show(msg, context, duration: duration, gravity: gravity);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(Constants.appTitle),
+      ),
+      drawer: CustomDrawer(),
+      body: Center(
+        child: imageFile != null
+            ? RepaintBoundary(
+                key: _globalKey,
+                child: state == AppState.picked
+                    ? Crop.file(imageFile, key: cropKey)
+                    : Image.file(imageFile),
+              )
+            : Container(
+                child: Text('Click or Select image!'),
+              ),
+      ),
+      floatingActionButton: Column(
+          mainAxisAlignment: MainAxisAlignment.end, children: _buildButtons()),
+    );
   }
 }

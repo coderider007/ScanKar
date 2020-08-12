@@ -5,9 +5,10 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 
 class FileStorageService {
+  FileStorageService._privateConstructor();
+
   static final FileStorageService instance =
       FileStorageService._privateConstructor();
-  FileStorageService._privateConstructor();
 
   Future<String> get _localPath async {
     Directory directory = Platform.isAndroid
@@ -32,7 +33,7 @@ class FileStorageService {
   }
 
   Future<void> deleteDir(Directory directory) async {
-    return directory.deleteSync();
+    return directory.deleteSync(recursive: true);
   }
 
   Future<void> renameDir(Directory directory, String name) async {

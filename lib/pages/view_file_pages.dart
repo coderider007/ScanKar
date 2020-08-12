@@ -7,18 +7,21 @@ import '../services/file_storage.dart';
 import 'package:flutter/material.dart';
 
 class ViewFilePages extends StatefulWidget {
-  final Directory directory;
   ViewFilePages(this.directory);
+
+  final Directory directory;
 
   @override
   _ViewFilePagesState createState() => _ViewFilePagesState(this.directory);
 }
 
 class _ViewFilePagesState extends State<ViewFilePages> {
-  final Directory directory;
-  final FileStorageService _fileStorageService = FileStorageService.instance;
-  List<FileDetails> allFiles;
   _ViewFilePagesState(this.directory);
+
+  List<FileDetails> allFiles;
+  final Directory directory;
+
+  final FileStorageService _fileStorageService = FileStorageService.instance;
 
   @override
   void initState() {
@@ -47,6 +50,24 @@ class _ViewFilePagesState extends State<ViewFilePages> {
       }
     }
     // return allFiles;
+  }
+
+  void _updateListItems(int oldIndex, int newIndex) async {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    // final File atOldIndex = allFiles[oldIndex].file;
+    // final File atNewIndex = allFiles[newIndex].file;
+
+    final FileDetails item = allFiles.removeAt(oldIndex);
+    allFiles.insert(newIndex, item);
+    // _fileStorageService.swapFileNames(atOldIndex, atNewIndex);
+    _fileStorageService.renameFiles(allFiles.map((e) => e.file).toList());
+
+    setState(() {
+      allFiles = allFiles;
+    });
   }
 
   @override
@@ -138,23 +159,5 @@ class _ViewFilePagesState extends State<ViewFilePages> {
               ),
             ),
     );
-  }
-
-  void _updateListItems(int oldIndex, int newIndex) async {
-    if (newIndex > oldIndex) {
-      newIndex -= 1;
-    }
-
-    // final File atOldIndex = allFiles[oldIndex].file;
-    // final File atNewIndex = allFiles[newIndex].file;
-
-    final FileDetails item = allFiles.removeAt(oldIndex);
-    allFiles.insert(newIndex, item);
-    // _fileStorageService.swapFileNames(atOldIndex, atNewIndex);
-    _fileStorageService.renameFiles(allFiles.map((e) => e.file).toList());
-
-    setState(() {
-      allFiles = allFiles;
-    });
   }
 }

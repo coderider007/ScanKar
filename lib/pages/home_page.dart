@@ -8,6 +8,7 @@ import '../data/file_details.dart';
 import '../custom/custom_drawer.dart';
 import '../services/file_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:toast/toast.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<List<FileDetails>> allFiles;
+
   FileStorageService _fileStorageService = FileStorageService.instance;
   PdfGeneratorService _pdfGeneratorService = PdfGeneratorService.instance;
 
@@ -32,7 +34,7 @@ class _HomePageState extends State<HomePage> {
     _fileStorageService.deleteDir(directory).then((value) => {
           setState(() {
             allFiles = loadImageList();
-            showToast("Not implemented...", gravity: Toast.BOTTOM);
+            showToast("Deleted.", gravity: Toast.BOTTOM);
           })
         });
   }
@@ -41,7 +43,7 @@ class _HomePageState extends State<HomePage> {
     _fileStorageService.renameDir(directory, name).then((value) => {
           setState(() {
             allFiles = loadImageList();
-            showToast("Not implemented...", gravity: Toast.BOTTOM);
+            showToast("Renamed to '$name'", gravity: Toast.BOTTOM);
           })
         });
   }
@@ -71,88 +73,6 @@ class _HomePageState extends State<HomePage> {
     // }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(Constants.appTitle + ' - Home'),
-      ),
-      drawer: CustomDrawer(),
-      body: Center(
-        child: FutureBuilder(
-          builder: (context, projectSnap) {
-            if (projectSnap.hasData) {
-              //print('project snapshot data is: ${projectSnap.data}');
-              return Container(
-                child: ListView.builder(
-                  itemCount: projectSnap.data.length,
-                  itemBuilder: (context, index) {
-                    FileDetails fileDetails = projectSnap.data[index];
-                    return Container(
-                      padding: EdgeInsets.all(10),
-                      child: GestureDetector(
-                        onLongPress: () {
-                          showFileOptionsDialog(context, fileDetails);
-                        },
-                        child: Stack(
-                          children: <Widget>[
-                            Card(
-                              child: ListTile(
-                                leading: Image.file(
-                                  fileDetails.file,
-                                  // width: MediaQuery.of(context).size.width / 2,
-                                  width: 50.0,
-                                  height: 80.0,
-                                  fit: BoxFit.fill,
-                                ),
-                                title: Text(fileDetails.name),
-                                subtitle: Text('Last modified at ' +
-                                    fileDetails.modified.toString()),
-                              ),
-                            ),
-                            Positioned(
-                              top: 5,
-                              right: 0,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.more_vert,
-                                ),
-                                onPressed: () {
-                                  showFileOptionsDialog(context, fileDetails);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            } else {
-              return Container(
-                child: Center(
-                  child: Text('No Files!'),
-                ),
-              );
-            }
-          },
-          future: allFiles,
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepOrange,
-        onPressed: () {
-          // Navigator.of(context).pop();
-          Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW);
-        },
-        heroTag: 'imageScanNew',
-        tooltip: 'Scan new document',
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
   showFileOptionsDialog(BuildContext context, FileDetails fileDetails) {
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
@@ -164,12 +84,13 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             CustomListTile(Icons.share, "Share", () {
               Navigator.of(context).pop();
-              showToast("Not implemented...", gravity: Toast.BOTTOM);
+              _shareFile(context, fileDetails.directory);
+              //showToast("PDF shared!", gravity: Toast.BOTTOM);
             }),
             CustomListTile(Icons.picture_as_pdf, "Download as PDF", () {
               Navigator.of(context).pop();
               _pdfGeneratorService.createPdf(context, fileDetails.directory);
-              showToast("Downloading to as PDF...",
+              showToast("Downloaded as PDF...",
                   duration: 3, gravity: Toast.BOTTOM);
             }),
             CustomListTile(Icons.open_in_new, "Edit", () {
@@ -247,5 +168,96 @@ class _HomePageState extends State<HomePage> {
 
   void showToast(String msg, {int duration, int gravity}) {
     Toast.show(msg, context, duration: duration, gravity: gravity);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(Constants.appTitle + ' - Home'),
+      ),
+      drawer: CustomDrawer(),
+      body: Center(
+        child: FutureBuilder(
+          builder: (context, projectSnap) {
+            if (projectSnap.hasData && projectSnap.data.length > 0) {
+              //print('project snapshot data is: ${projectSnap.data}');
+              return Container(
+                child: ListView.builder(
+                  itemCount: projectSnap.data.length,
+                  itemBuilder: (context, index) {
+                    FileDetails fileDetails = projectSnap.data[index];
+                    return Container(
+                      padding: EdgeInsets.all(10),
+                      child: GestureDetector(
+                        onLongPress: () {
+                          showFileOptionsDialog(context, fileDetails);
+                        },
+                        child: Stack(
+                          children: <Widget>[
+                            Card(
+                              child: ListTile(
+                                leading: Image.file(
+                                  fileDetails.file,
+                                  // width: MediaQuery.of(context).size.width / 2,
+                                  width: 50.0,
+                                  height: 80.0,
+                                  fit: BoxFit.fill,
+                                ),
+                                title: Text(fileDetails.name),
+                                subtitle: Text('Last modified at ' +
+                                    fileDetails.modified.toString()),
+                              ),
+                            ),
+                            Positioned(
+                              top: 5,
+                              right: 0,
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.more_vert,
+                                ),
+                                onPressed: () {
+                                  showFileOptionsDialog(context, fileDetails);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            } else {
+              return Container(
+                child: Center(
+                  child: Text('No Files!'),
+                ),
+              );
+            }
+          },
+          future: allFiles,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.deepOrange,
+        onPressed: () {
+          // Navigator.of(context).pop();
+          Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW);
+        },
+        heroTag: 'imageScanNew',
+        tooltip: 'Scan new document',
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _shareFile(BuildContext context, Directory directory) async {
+    File file = await _pdfGeneratorService.createPdf(context, directory);
+    await FlutterShare.shareFile(
+      title: 'Share',
+      text: 'Share PDF to ',
+      filePath: file.path,
+    );
   }
 }
