@@ -256,7 +256,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepOrange,
+        backgroundColor: Constants.MAIN_COLOR,
         onPressed: () {
           // Navigator.of(context).pop();
           Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW);

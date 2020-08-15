@@ -63,7 +63,7 @@ class _ViewFilePagesState extends State<ViewFilePages> {
     final FileDetails item = allFiles.removeAt(oldIndex);
     allFiles.insert(newIndex, item);
     // _fileStorageService.swapFileNames(atOldIndex, atNewIndex);
-    _fileStorageService.renameFiles(allFiles.map((e) => e.file).toList());
+    await _fileStorageService.renameFiles(allFiles.map((e) => e.file).toList());
 
     setState(() {
       allFiles = allFiles;

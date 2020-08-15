@@ -1,3 +1,5 @@
+import 'package:ScanKar/constants.dart';
+
 import './route_generator.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +11,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ScanKar',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.light().copyWith(primaryColor: Colors.deepOrange),
+      theme: ThemeData.light().copyWith(primaryColor: Constants.MAIN_COLOR),
       initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
     );

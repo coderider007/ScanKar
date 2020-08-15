@@ -42,18 +42,18 @@ class _ScanPageState extends State<ScanPage> {
     NoFilter(),
     InkwellFilter(),
     BrannanFilter(),
-    MoonFilter(),
+    // MoonFilter(),
     XProIIFilter(),
     AddictiveBlueFilter(),
     AddictiveRedFilter(),
-    AmaroFilter(),
+    // AmaroFilter(),
     GinghamFilter(),
-    GinzaFilter(),
-    HudsonFilter(),
-    LarkFilter(),
-    LoFiFilter(),
-    SlumberFilter(),
-    StinsonFilter(),
+    // GinzaFilter(),
+    // HudsonFilter(),
+    // LarkFilter(),
+    // LoFiFilter(),
+    // SlumberFilter(),
+    // StinsonFilter(),
     //MyBrightnessFilter(),
     //MyGreyscaleFilter()
   ];
@@ -127,7 +127,7 @@ class _ScanPageState extends State<ScanPage> {
       case AppState.ready:
         return [
           FloatingActionButton(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Constants.MAIN_COLOR,
             onPressed: () {
               buttonOnPress(AppAction.pick_gallery);
             },
@@ -138,7 +138,7 @@ class _ScanPageState extends State<ScanPage> {
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
             child: FloatingActionButton(
-              backgroundColor: Colors.deepOrange,
+              backgroundColor: Constants.MAIN_COLOR,
               onPressed: () {
                 buttonOnPress(AppAction.pick_camera);
               },
@@ -151,7 +151,7 @@ class _ScanPageState extends State<ScanPage> {
       case AppState.picked:
         return [
           FloatingActionButton(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Constants.MAIN_COLOR,
             onPressed: () {
               buttonOnPress(AppAction.crop);
             },
@@ -161,7 +161,7 @@ class _ScanPageState extends State<ScanPage> {
       case AppState.cropped:
         return [
           FloatingActionButton(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Constants.MAIN_COLOR,
             onPressed: () {
               buttonOnPress(AppAction.edit);
             },
@@ -171,7 +171,7 @@ class _ScanPageState extends State<ScanPage> {
       case AppState.edited:
         return [
           FloatingActionButton(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Constants.MAIN_COLOR,
             onPressed: () {
               buttonOnPress(AppAction.done);
             },
@@ -182,7 +182,7 @@ class _ScanPageState extends State<ScanPage> {
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
             child: FloatingActionButton(
-              backgroundColor: Colors.deepOrange,
+              backgroundColor: Constants.MAIN_COLOR,
               onPressed: () {
                 buttonOnPress(AppAction.addmore);
               },
@@ -195,7 +195,7 @@ class _ScanPageState extends State<ScanPage> {
       case AppState.saved:
         return [
           FloatingActionButton(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Constants.MAIN_COLOR,
             onPressed: () {
               buttonOnPress(AppAction.done);
             },
@@ -297,14 +297,14 @@ class _ScanPageState extends State<ScanPage> {
       context,
       new MaterialPageRoute(
         builder: (context) => new PhotoFilterSelector(
-          appBarColor: Colors.deepOrange,
+          appBarColor: Constants.MAIN_COLOR,
           title: Text("ScanKar - Filter"),
           image: imageLib.decodeImage(imageFile.readAsBytesSync()),
           filters: _defaultFiltersList,
           filename: _fileStorageService.getFileName(imageFile.path),
           loader: Center(
               child: CircularProgressIndicator(
-            backgroundColor: Colors.deepOrange,
+            backgroundColor: Constants.MAIN_COLOR,
           )),
           fit: BoxFit.contain,
         ),

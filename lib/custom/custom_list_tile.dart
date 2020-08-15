@@ -1,3 +1,4 @@
+import 'package:ScanKar/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomListTile extends StatelessWidget {
@@ -15,7 +16,7 @@ class CustomListTile extends StatelessWidget {
         decoration: BoxDecoration(
             border: Border(bottom: BorderSide(color: Colors.grey.shade400))),
         child: InkWell(
-          splashColor: Colors.deepOrange,
+          splashColor: Constants.MAIN_COLOR,
           onTap: onTap,
           child: Container(
             height: 50,
