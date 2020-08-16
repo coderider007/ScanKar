@@ -144,12 +144,7 @@ class _HomePageState extends State<HomePage> {
           child: Text('OK'),
           onPressed: () {
             Navigator.of(context).pop();
-            _fileStorageService.renameDir(
-                fileDetails.directory, fileNameController.text);
-            showToast('Renamed');
-            setState(() {
-              allFiles = loadImageList();
-            });
+            _renameDir(context, fileDetails.directory, fileNameController.text);
           },
         ),
       ],
@@ -162,6 +157,15 @@ class _HomePageState extends State<HomePage> {
         return alert;
       },
     );
+  }
+
+  void _renameDir(
+      BuildContext context, Directory directory, String name) async {
+    await _fileStorageService.renameDir(directory, name);
+    showToast('Renamed');
+    setState(() {
+      allFiles = loadImageList();
+    });
   }
 
   void showToast(String msg, {int duration, int gravity}) {
@@ -198,6 +202,9 @@ class _HomePageState extends State<HomePage> {
                       padding: EdgeInsets.all(10),
                       child: GestureDetector(
                         onLongPress: () {
+                          showFileOptionsDialog(context, fileDetails);
+                        },
+                        onTap: () {
                           showFileOptionsDialog(context, fileDetails);
                         },
                         onDoubleTap: () {

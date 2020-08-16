@@ -65,17 +65,17 @@ class PdfGeneratorService {
               (file) => PdfPage(
                 imageFile: file,
                 //size: Size(1920, 1080),
-                compressionQuality: 0.5,
+                compressionQuality: 1.0,
               ),
             )
             .toList(),
         output: output,
       );
       var _pdfStat = await output.stat();
-      var _status = 'PDF Generated (${_pdfStat.size ~/ 1024}kb)';
+      var _status = 'PDF (${_pdfStat.size ~/ 1024}kb) saved to Downloads';
       print(_pdfStat.toString());
       print(_status);
-      showToast(context, _status, duration: 3);
+      showToast(context, _status, duration: 5);
     } catch (e) {}
 
     return output;

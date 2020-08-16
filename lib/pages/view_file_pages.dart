@@ -20,8 +20,8 @@ class _ViewFilePagesState extends State<ViewFilePages> {
 
   List<FileDetails> allFiles;
   final Directory directory;
-
   final FileStorageService _fileStorageService = FileStorageService.instance;
+  //final String fileName = _fileStorageService.getFileName(directory.path);
 
   @override
   void initState() {
@@ -74,9 +74,9 @@ class _ViewFilePagesState extends State<ViewFilePages> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Constants.appTitle + ' - Current Pages'),
+        title: Text(_fileStorageService.getFileName(directory.path)),
       ),
-      drawer: CustomDrawer(),
+      //drawer: CustomDrawer(),
       body: allFiles != null && allFiles.length > 0
           ? Center(
               child: Container(
@@ -106,12 +106,12 @@ class _ViewFilePagesState extends State<ViewFilePages> {
                             //   ),
                             // ),
                             Padding(
-                              padding: const EdgeInsets.all(0),
+                              padding: const EdgeInsets.only(top: 0),
                               child: Image.file(
                                 fileDetails.file,
                                 // width: MediaQuery.of(context).size.width / 2,
-                                width: 150.0,
-                                height: 180.0,
+                                // width: 150.0,
+                                // height: 180.0,
                                 fit: BoxFit.fill,
                               ),
                             ),

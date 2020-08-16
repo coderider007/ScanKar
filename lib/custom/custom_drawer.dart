@@ -1,11 +1,25 @@
 import 'package:ScanKar/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'custom_list_tile.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({Key key}) : super(key: key);
+
+  Future<void> _launchInWebViewOrVC() async {
+    if (await canLaunch(Constants.PRIVACY_URL)) {
+      await launch(
+        Constants.PRIVACY_URL,
+        forceSafariVC: true,
+        forceWebView: true,
+        // headers: <String, String>{'my_header_key': 'my_header_value'},
+      );
+    } else {
+      throw 'Could not launch $Constants.PRIVACY_URL';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +70,9 @@ class CustomDrawer extends StatelessWidget {
                   Navigator.of(context).pop();
                   Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW);
                 }),
-                CustomListTile(Icons.share, "Share", () {}),
+                CustomListTile(Icons.security, "Privacy Policy", () {
+                  _launchInWebViewOrVC();
+                }),
                 CustomListTile(Icons.exit_to_app, "Exit", () {
                   Navigator.of(context).pop();
                   SystemChannels.platform.invokeMethod('SystemNavigator.pop');
