@@ -268,11 +268,11 @@ class _ScanPageState extends State<ScanPage> {
     // this will sample image in higher resolution to make cropped image larger
     // final sampledFile = await ImageCrop.sampleImage(
     //   file: imageFile,
-    //   preferredSize: (2000 / scale).round(),
+    //   preferredSize: (2048 / scale).round(),
     // );
     final sampledFile = await ImageCrop.sampleImage(
       file: imageFile,
-      preferredWidth: (1024 / scale).round(),
+      preferredWidth: (2048 / scale).round(),
       preferredHeight: (4096 / scale).round(),
     );
 
@@ -293,6 +293,8 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Future<void> _editImage() async {
+    // var image = imageLib.decodeImage(imageFile.readAsBytesSync());
+    // image = imageLib.copyResize(image, width: 600);
     Map imagefile = await Navigator.push(
       context,
       new MaterialPageRoute(
@@ -303,9 +305,10 @@ class _ScanPageState extends State<ScanPage> {
           filters: _defaultFiltersList,
           filename: _fileStorageService.getFileName(imageFile.path),
           loader: Center(
-              child: CircularProgressIndicator(
-            backgroundColor: Constants.MAIN_COLOR,
-          )),
+            child: CircularProgressIndicator(
+              backgroundColor: Constants.MAIN_COLOR,
+            ),
+          ),
           fit: BoxFit.contain,
         ),
       ),
@@ -386,7 +389,11 @@ class _ScanPageState extends State<ScanPage> {
                     : Image.file(imageFile),
               )
             : Container(
-                child: Text('Click or Select image!'),
+                width: MediaQuery.of(context).size.width / 1.2,
+                child: Center(
+                  child: Text(
+                      'Click on camera icon to capture image or gallery icon to pick from gallery!'),
+                ),
               ),
       ),
       floatingActionButton: Column(

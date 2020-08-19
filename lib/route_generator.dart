@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:ScanKar/constants.dart';
+import 'package:ScanKar/pages/home_page.dart';
+import 'package:ScanKar/pages/view_pages.dart';
 
 import 'pages/scan_page.dart';
 import 'pages/home_page.dart';
@@ -21,7 +23,9 @@ class RouteGenerator {
         final Directory directory = settings.arguments;
         return MaterialPageRoute(
             builder: (context) => ViewFilePages(directory));
-
+      case Constants.ROUTE_VIEW_PAGE:
+        final File page = settings.arguments;
+        return MaterialPageRoute(builder: (context) => ViewPages(page));
       default:
         return _errorRoute();
     }

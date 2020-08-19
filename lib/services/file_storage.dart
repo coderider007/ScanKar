@@ -152,4 +152,8 @@ class FileStorageService {
   String getFileName(String filepath) {
     return path.basename(filepath);
   }
+
+  String getFileNameWithoutExtension(String filepath) {
+    return path.basenameWithoutExtension(filepath);
+  }
 }

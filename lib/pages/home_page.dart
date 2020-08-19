@@ -253,8 +253,10 @@ class _HomePageState extends State<HomePage> {
               );
             } else {
               return Container(
+                width: MediaQuery.of(context).size.width / 1.2,
                 child: Center(
-                  child: Text('No Files!'),
+                  child: Text(
+                      'No scanned file exists. Click the plus icon to create new file!'),
                 ),
               );
             }

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import '../constants.dart';
-import '../custom/custom_drawer.dart';
 import '../data/file_details.dart';
 import '../services/file_storage.dart';
 import 'package:flutter/material.dart';
@@ -91,61 +90,59 @@ class _ViewFilePagesState extends State<ViewFilePages> {
                     allFiles.length,
                     (index) {
                       FileDetails fileDetails = allFiles[index];
-                      return Card(
-                        margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      return InkWell(
                         key: ValueKey("value$index"),
-                        shadowColor: Colors.grey,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            // Padding(
-                            //   padding: const EdgeInsets.all(8.0),
-                            //   child: Text(
-                            //     (index + 1).toString(),
-                            //     textAlign: TextAlign.left,
-                            //   ),
-                            // ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 0),
-                              child: Image.file(
-                                fileDetails.file,
-                                // width: MediaQuery.of(context).size.width / 2,
-                                // width: 150.0,
-                                // height: 180.0,
-                                fit: BoxFit.fill,
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            Constants.ROUTE_VIEW_PAGE,
+                            arguments: fileDetails.file,
+                          );
+                        },
+                        child: Card(
+                          margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                          shadowColor: Colors.grey,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(top: 0),
+                                child: Image.file(
+                                  fileDetails.file,
+                                  // width: MediaQuery.of(context).size.width / 2,
+                                  // width: 150.0,
+                                  // height: 180.0,
+                                  fit: BoxFit.fill,
+                                ),
                               ),
-                            ),
-                            // Padding(
-                            //   padding: const EdgeInsets.all(8.0),
-                            //   child: Text(fileDetails.name),
-                            // ),
-                            Padding(
-                              padding: const EdgeInsets.all(2.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  // Icon(Icons.share),
-                                  // Icon(Icons.file_download),
-                                  // Icon(Icons.edit),
-                                  // Text(fileDetails.name),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 16.0),
-                                    child: Text(
-                                      'Page ' + (index + 1).toString(),
-                                      textAlign: TextAlign.right,
+                              Padding(
+                                padding: const EdgeInsets.all(2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(left: 16.0),
+                                      child: Text(
+                                        // "Page " +
+                                        //     _fileStorageService.getFileName(
+                                        //         fileDetails.file.path),
+                                        'Page ' + (index + 1).toString(),
+                                        textAlign: TextAlign.right,
+                                      ),
                                     ),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {
-                                      deleteFile(fileDetails.file);
-                                    },
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
+                                    IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () {
+                                        deleteFile(fileDetails.file);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       );
                     },
