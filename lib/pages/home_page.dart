@@ -64,8 +64,14 @@ class _HomePageState extends State<HomePage> {
             directory: subDirs[i]));
       }
     }
+    tempAllFiles.sort((a, b) => compare(a.modified, b.modified));
 
     return tempAllFiles;
+  }
+
+  int compare(DateTime a, DateTime b) {
+    if (a == b || a.isAtSameMomentAs(b)) return 0;
+    return a.isAfter(b) ? -1 : 1;
   }
 
   showFileOptionsDialog(BuildContext context, FileDetails fileDetails) {
@@ -83,7 +89,11 @@ class _HomePageState extends State<HomePage> {
                 context,
                 Constants.ROUTE_PAGES_IN_FILE,
                 arguments: fileDetails.directory,
-              );
+              ).then((value) => {
+                    setState(() {
+                      allFiles = loadImageList();
+                    })
+                  });
             }),
             CustomListTile(Icons.share, "Share", () {
               Navigator.of(context).pop();
@@ -162,7 +172,7 @@ class _HomePageState extends State<HomePage> {
   void _renameDir(
       BuildContext context, Directory directory, String name) async {
     await _fileStorageService.renameDir(directory, name);
-    showToast('Renamed');
+    showToast('Renamed', gravity: Toast.BOTTOM);
     setState(() {
       allFiles = loadImageList();
     });
@@ -212,7 +222,11 @@ class _HomePageState extends State<HomePage> {
                             context,
                             Constants.ROUTE_PAGES_IN_FILE,
                             arguments: fileDetails.directory,
-                          );
+                          ).then((value) => {
+                                setState(() {
+                                  allFiles = loadImageList();
+                                })
+                              });
                         },
                         child: Stack(
                           children: <Widget>[
@@ -267,8 +281,14 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Constants.MAIN_COLOR,
         onPressed: () {
-          // Navigator.of(context).pop();
-          Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW);
+          //Navigator.of(context).pop();
+          Navigator.of(context)
+              .pushNamed(Constants.ROUTE_SCAN_NEW)
+              .then((value) => {
+                    setState(() {
+                      allFiles = loadImageList();
+                    })
+                  });
         },
         heroTag: 'imageScanNew',
         tooltip: 'Scan new document',

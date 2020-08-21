@@ -51,7 +51,49 @@ class _ViewFilePagesState extends State<ViewFilePages> {
     // return allFiles;
   }
 
-  void _updateListItems(int oldIndex, int newIndex) async {
+  // void _backPressed(BuildContext context) async {
+  //   setState(() {
+  //     Navigator.of(context).pop();
+  //   });
+  // }
+
+  Future<bool> _onDeletePressed(File file) {
+    return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            titlePadding: EdgeInsets.only(bottom: 8, top: 4),
+            title: Center(child: Text('Are you sure?')),
+            content: Text(
+              'Do you want delete this page?',
+              style: TextStyle(fontSize: 18),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  "NO",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 16),
+              FlatButton(
+                onPressed: () =>
+                    {Navigator.of(context).pop(false), deleteFile(file)},
+                child: Text(
+                  "YES",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<void> _updateListItems(int oldIndex, int newIndex) async {
     if (newIndex > oldIndex) {
       newIndex -= 1;
     }
@@ -73,6 +115,10 @@ class _ViewFilePagesState extends State<ViewFilePages> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(_fileStorageService.getFileName(directory.path)),
       ),
       //drawer: CustomDrawer(),
@@ -83,8 +129,8 @@ class _ViewFilePagesState extends State<ViewFilePages> {
                 width: 200,
                 // padding: EdgeInsets.all(8),
                 child: ReorderableListView(
-                  onReorder: (int oldIndex, int newIndex) {
-                    _updateListItems(oldIndex, newIndex);
+                  onReorder: (int oldIndex, int newIndex) async {
+                    await _updateListItems(oldIndex, newIndex);
                   },
                   children: List.generate(
                     allFiles.length,
@@ -134,9 +180,8 @@ class _ViewFilePagesState extends State<ViewFilePages> {
                                     ),
                                     IconButton(
                                       icon: Icon(Icons.delete),
-                                      onPressed: () {
-                                        deleteFile(fileDetails.file);
-                                      },
+                                      onPressed: () =>
+                                          _onDeletePressed(fileDetails.file),
                                     ),
                                   ],
                                 ),

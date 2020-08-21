@@ -67,7 +67,7 @@ class CustomDrawer extends StatelessWidget {
                 }),
                 CustomListTile(Icons.scanner, "Scan document", () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
+                  //Navigator.of(context).pop();
                   Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW);
                 }),
                 CustomListTile(Icons.security, "Privacy Policy", () {

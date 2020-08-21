@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
+// import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:edge_detection/edge_detection.dart';
@@ -15,7 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
 
 import '../constants.dart';
-import '../custom/custom_drawer.dart';
+// import '../custom/custom_drawer.dart';
 import '../services/file_storage.dart';
 
 class ScanPage extends StatefulWidget {
@@ -27,7 +27,7 @@ class ScanPage extends StatefulWidget {
 
 enum AppState { ready, picked, cropped, edited, saved }
 enum AppAction { pick_gallery, pick_camera, crop, edit, addmore, done }
-final GlobalKey _globalKey = GlobalKey<CropState>();
+// final GlobalKey _globalKey = GlobalKey<CropState>();
 final FileStorageService _fileStorageService = FileStorageService.instance;
 
 class _ScanPageState extends State<ScanPage> {
@@ -323,12 +323,13 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Future<void> _addImage() async {
-    RenderRepaintBoundary boundary =
-        _globalKey.currentContext.findRenderObject();
-    ui.Image image = await boundary.toImage();
-    ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    Uint8List bytes = byteData.buffer.asUint8List();
-    filesInAlbum.add(bytes);
+    // RenderRepaintBoundary boundary =
+    //     _globalKey.currentContext.findRenderObject();
+    // ui.Image image = await boundary.toImage();
+    // ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    // Uint8List bytes = byteData.buffer.asUint8List();
+
+    filesInAlbum.add(imageFile.readAsBytesSync());
 
     setState(() {
       this.filesInAlbum = filesInAlbum;
@@ -350,7 +351,8 @@ class _ScanPageState extends State<ScanPage> {
       filesInAlbum.clear();
       state = AppState.saved;
       Navigator.of(context).pop();
-      Navigator.of(context).pushNamed(Constants.ROUTE_HOME);
+      //Navigator.of(context).pop();
+      //Navigator.of(context).pushNamed(Constants.ROUTE_HOME);
     });
     showToast("Saved", gravity: Toast.BOTTOM);
   }
@@ -379,11 +381,11 @@ class _ScanPageState extends State<ScanPage> {
       appBar: AppBar(
         title: Text(Constants.appTitle),
       ),
-      drawer: CustomDrawer(),
+      //drawer: CustomDrawer(),
       body: Center(
         child: imageFile != null
             ? RepaintBoundary(
-                key: _globalKey,
+                // key: _globalKey,
                 child: state == AppState.picked
                     ? Crop.file(imageFile, key: cropKey)
                     : Image.file(imageFile),
