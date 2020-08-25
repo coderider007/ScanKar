@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart' as path;
 
 import 'package:path_provider/path_provider.dart';
@@ -148,6 +149,11 @@ class FileStorageService {
   //     temp.renameSync(fileName2);
   //   }
   // }
+
+  String timeStamp() {
+    return DateFormat("yyyyMMdd_HHmmss").format(DateTime.now());
+    // return DateFormat.yMEd().add_jms().format(DateTime.now());
+  }
 
   String getFileName(String filepath) {
     return path.basename(filepath);

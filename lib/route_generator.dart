@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:ScanKar/constants.dart';
 import 'package:ScanKar/pages/home_page.dart';
+import 'package:ScanKar/pages/pdf_viewer.dart';
 import 'package:ScanKar/pages/view_pages.dart';
 
 import 'pages/scan_page.dart';
@@ -26,6 +27,9 @@ class RouteGenerator {
       case Constants.ROUTE_VIEW_PAGE:
         final File page = settings.arguments;
         return MaterialPageRoute(builder: (context) => ViewPages(page));
+      case Constants.ROUTE_VIEW_PDF:
+        final File pdfFile = settings.arguments;
+        return MaterialPageRoute(builder: (context) => ViewPDF(pdfFile));
       default:
         return _errorRoute();
     }

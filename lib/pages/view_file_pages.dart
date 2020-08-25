@@ -117,7 +117,7 @@ class _ViewFilePagesState extends State<ViewFilePages> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.pop(context, true),
         ),
         title: Text(_fileStorageService.getFileName(directory.path)),
       ),

@@ -341,7 +341,7 @@ class _ScanPageState extends State<ScanPage> {
 
   void _saveAllImages() async {
     await _addImage();
-    var folderName = generateFolderName();
+    var folderName = _fileStorageService.timeStamp();
     for (int i = 0; i < filesInAlbum.length; i++) {
       await _fileStorageService.createFileToDir(
           (i + 1), filesInAlbum[i], folderName);
@@ -366,10 +366,10 @@ class _ScanPageState extends State<ScanPage> {
     showToast("Cleared", gravity: Toast.BOTTOM);
   }
 
-  String generateFolderName() {
-    return DateFormat("yyyyMMdd_HHmmss").format(DateTime.now());
-    // return DateFormat.yMEd().add_jms().format(DateTime.now());
-  }
+  // String generateFolderName() {
+  //   return DateFormat("yyyyMMdd_HHmmss").format(DateTime.now());
+  //   // return DateFormat.yMEd().add_jms().format(DateTime.now());
+  // }
 
   void showToast(String msg, {int duration, int gravity}) {
     Toast.show(msg, context, duration: duration, gravity: gravity);

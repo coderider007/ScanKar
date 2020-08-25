@@ -89,11 +89,18 @@ class _HomePageState extends State<HomePage> {
                 context,
                 Constants.ROUTE_PAGES_IN_FILE,
                 arguments: fileDetails.directory,
-              ).then((value) => {
-                    setState(() {
-                      allFiles = loadImageList();
-                    })
-                  });
+              ).then(
+                (value) => {
+                  setState(() {
+                    allFiles = loadImageList();
+                  })
+                },
+                // onError: (error) => {
+                //       setState(() {
+                //         allFiles = loadImageList();
+                //       })
+                //     }
+              );
             }),
             CustomListTile(Icons.share, "Share", () {
               Navigator.of(context).pop();
@@ -103,8 +110,8 @@ class _HomePageState extends State<HomePage> {
             CustomListTile(Icons.picture_as_pdf, "Download as PDF", () {
               Navigator.of(context).pop();
               _pdfGeneratorService.createPdf(context, fileDetails.directory);
-              showToast("Downloaded as PDF...",
-                  duration: 3, gravity: Toast.BOTTOM);
+              // showToast("Downloaded as PDF...",
+              //     duration: 3, gravity: Toast.BOTTOM);
             }),
             CustomListTile(Icons.edit, "Rename", () {
               Navigator.of(context).pop();
@@ -183,7 +190,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _shareFile(BuildContext context, Directory directory) async {
-    File file = await _pdfGeneratorService.createPdf(context, directory);
+    File file = await _pdfGeneratorService.getIfExists(directory);
+
+    if (!file.existsSync()) {
+      file = await _pdfGeneratorService.createPdf(context, directory);
+    }
+
     await FlutterShare.shareFile(
       title: 'Share',
       text: 'Share PDF to ',
@@ -222,11 +234,18 @@ class _HomePageState extends State<HomePage> {
                             context,
                             Constants.ROUTE_PAGES_IN_FILE,
                             arguments: fileDetails.directory,
-                          ).then((value) => {
-                                setState(() {
-                                  allFiles = loadImageList();
-                                })
-                              });
+                          ).then(
+                            (value) => {
+                              setState(() {
+                                allFiles = loadImageList();
+                              })
+                            },
+                            // onError: (error) => {
+                            //       setState(() {
+                            //         allFiles = loadImageList();
+                            //       })
+                            //     }
+                          );
                         },
                         child: Stack(
                           children: <Widget>[
@@ -282,13 +301,18 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Constants.MAIN_COLOR,
         onPressed: () {
           //Navigator.of(context).pop();
-          Navigator.of(context)
-              .pushNamed(Constants.ROUTE_SCAN_NEW)
-              .then((value) => {
-                    setState(() {
-                      allFiles = loadImageList();
-                    })
-                  });
+          Navigator.of(context).pushNamed(Constants.ROUTE_SCAN_NEW).then(
+                (value) => {
+                  setState(() {
+                    allFiles = loadImageList();
+                  })
+                },
+                // onError: (error) => {
+                //       setState(() {
+                //         allFiles = loadImageList();
+                //       })
+                //     }
+              );
         },
         heroTag: 'imageScanNew',
         tooltip: 'Scan new document',
