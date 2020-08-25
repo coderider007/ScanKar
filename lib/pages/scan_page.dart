@@ -11,7 +11,7 @@ import 'package:image_crop/image_crop.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photofilters/photofilters.dart';
 import 'package:image/image.dart' as imageLib;
-import 'package:intl/intl.dart';
+// import 'package:intl/intl.dart';
 import 'package:toast/toast.dart';
 
 import '../constants.dart';
@@ -323,12 +323,6 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   Future<void> _addImage() async {
-    // RenderRepaintBoundary boundary =
-    //     _globalKey.currentContext.findRenderObject();
-    // ui.Image image = await boundary.toImage();
-    // ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    // Uint8List bytes = byteData.buffer.asUint8List();
-
     filesInAlbum.add(imageFile.readAsBytesSync());
 
     setState(() {
@@ -351,7 +345,6 @@ class _ScanPageState extends State<ScanPage> {
       filesInAlbum.clear();
       state = AppState.saved;
       Navigator.of(context).pop();
-      //Navigator.of(context).pop();
       //Navigator.of(context).pushNamed(Constants.ROUTE_HOME);
     });
     showToast("Saved", gravity: Toast.BOTTOM);
@@ -366,11 +359,6 @@ class _ScanPageState extends State<ScanPage> {
     showToast("Cleared", gravity: Toast.BOTTOM);
   }
 
-  // String generateFolderName() {
-  //   return DateFormat("yyyyMMdd_HHmmss").format(DateTime.now());
-  //   // return DateFormat.yMEd().add_jms().format(DateTime.now());
-  // }
-
   void showToast(String msg, {int duration, int gravity}) {
     Toast.show(msg, context, duration: duration, gravity: gravity);
   }
@@ -381,7 +369,6 @@ class _ScanPageState extends State<ScanPage> {
       appBar: AppBar(
         title: Text(Constants.appTitle),
       ),
-      //drawer: CustomDrawer(),
       body: Center(
         child: imageFile != null
             ? RepaintBoundary(

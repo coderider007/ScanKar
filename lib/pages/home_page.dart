@@ -95,11 +95,6 @@ class _HomePageState extends State<HomePage> {
                     allFiles = loadImageList();
                   })
                 },
-                // onError: (error) => {
-                //       setState(() {
-                //         allFiles = loadImageList();
-                //       })
-                //     }
               );
             }),
             CustomListTile(Icons.share, "Share", () {
@@ -119,7 +114,7 @@ class _HomePageState extends State<HomePage> {
             }),
             CustomListTile(Icons.delete, "Delete", () {
               Navigator.of(context).pop();
-              delteDirectory(fileDetails.directory);
+              _onDeletePressed(fileDetails.directory);
             }),
           ],
         ),
@@ -133,6 +128,44 @@ class _HomePageState extends State<HomePage> {
         return alert;
       },
     );
+  }
+
+  Future<bool> _onDeletePressed(Directory directory) {
+    return showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            titlePadding: EdgeInsets.only(bottom: 8, top: 4),
+            title: Center(child: Text('Are you sure?')),
+            content: Text(
+              'Do you want delete this file?',
+              style: TextStyle(fontSize: 18),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text(
+                  "NO",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(height: 16),
+              FlatButton(
+                onPressed: () => {
+                  Navigator.of(context).pop(false),
+                  delteDirectory(directory)
+                },
+                child: Text(
+                  "YES",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red),
+                ),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 
   showFileRenameDialog(BuildContext context, FileDetails fileDetails) {
@@ -153,8 +186,9 @@ class _HomePageState extends State<HomePage> {
         FlatButton(
           child: Text('Cancel'),
           onPressed: () {
+            // commented because of error. controller used after dispose called.
+            //fileNameController.dispose();
             Navigator.of(context).pop();
-            fileNameController.dispose();
           },
         ),
         FlatButton(
@@ -240,11 +274,6 @@ class _HomePageState extends State<HomePage> {
                                 allFiles = loadImageList();
                               })
                             },
-                            // onError: (error) => {
-                            //       setState(() {
-                            //         allFiles = loadImageList();
-                            //       })
-                            //     }
                           );
                         },
                         child: Stack(
@@ -307,11 +336,6 @@ class _HomePageState extends State<HomePage> {
                     allFiles = loadImageList();
                   })
                 },
-                // onError: (error) => {
-                //       setState(() {
-                //         allFiles = loadImageList();
-                //       })
-                //     }
               );
         },
         heroTag: 'imageScanNew',
