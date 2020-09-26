@@ -4,10 +4,11 @@ import 'dart:typed_data';
 // import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:edge_detection/edge_detection.dart';
+// import 'package:edge_detection/edge_detection.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
-import 'package:image_crop/image_crop.dart';
+// import 'package:flutter/services.dart';
+// import 'package:image_crop/image_crop.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:photofilters/photofilters.dart';
 import 'package:image/image.dart' as imageLib;
@@ -31,7 +32,7 @@ enum AppAction { pick_gallery, pick_camera, crop, edit, addmore, done }
 final FileStorageService _fileStorageService = FileStorageService.instance;
 
 class _ScanPageState extends State<ScanPage> {
-  final cropKey = GlobalKey<CropState>();
+  // final cropKey = GlobalKey<CropState>();
   ImageSource currentImageSource;
   List<Uint8List> filesInAlbum = List();
   File imageFile;
@@ -217,21 +218,27 @@ class _ScanPageState extends State<ScanPage> {
         PickedFile pikedFile = await _imagePicker.getImage(source: imageSource);
         if (pikedFile != null) pickeImage = File(pikedFile.path);
       } else if (imageSource == ImageSource.camera) {
-        // Platform messages may fail, so we use a try/catch PlatformException.
-        try {
-          //if (await Permission.camera.request().isGranted) {
-          String imagePath = await EdgeDetection.detectEdge;
-          print("image path = " + imagePath);
-          pickeImage = File(imagePath);
-          // } else if (await Permission.speech.isPermanentlyDenied) {
-          //   openAppSettings();
-          // }
-        } on PlatformException {}
+        // XXX: Pick using image picker
+        ImagePicker _imagePicker = new ImagePicker();
+        PickedFile pikedFile = await _imagePicker.getImage(source: imageSource);
+        if (pikedFile != null) pickeImage = File(pikedFile.path);
 
-        // If the widget was removed from the tree while the asynchronous platform
-        // message was in flight, we want to discard the reply rather than calling
-        // setState to update our non-existent appearance.
-        if (!mounted) return;
+        // XXX: EdgeDetection plugin
+        // Platform messages may fail, so we use a try/catch PlatformException.
+        // try {
+        //   //if (await Permission.camera.request().isGranted) {
+        //   String imagePath = await EdgeDetection.detectEdge;
+        //   print("image path = " + imagePath);
+        //   pickeImage = File(imagePath);
+        //   // } else if (await Permission.speech.isPermanentlyDenied) {
+        //   //   openAppSettings();
+        //   // }
+        // } on PlatformException {}
+
+        // // If the widget was removed from the tree while the asynchronous platform
+        // // message was in flight, we want to discard the reply rather than calling
+        // // setState to update our non-existent appearance.
+        // if (!mounted) return;
       }
     } else {
       showToast('Image Source can not be NULL');
@@ -239,56 +246,107 @@ class _ScanPageState extends State<ScanPage> {
 
     if (pickeImage != null) {
       imageFile = pickeImage;
-      if (imageSource == ImageSource.camera) {
-        await _editImage();
-        setState(() {
-          // imageFile = pickeImage;
-          // state = AppState.edited;
-          currentImageSource = imageSource;
-        });
-      } else {
-        setState(() {
-          imageFile = pickeImage;
-          state = AppState.picked;
-          currentImageSource = imageSource;
-        });
-      }
+
+      // XXX: Crop using plugin
+      await _cropImage();
+      setState(() {
+        // imageFile = pickeImage;
+        // state = AppState.picked;
+        // state = AppState.cropped;
+        currentImageSource = imageSource;
+      });
+      // XXX: Don't crop if picked using EdgeDetection plugin
+      // if (imageSource == ImageSource.camera) {
+      //   await _editImage();
+      //   setState(() {
+      //     // imageFile = pickeImage;
+      //     // state = AppState.edited;
+      //     currentImageSource = imageSource;
+      //   });
+      // } else {
+      //   setState(() {
+      //     imageFile = pickeImage;
+      //     state = AppState.picked;
+      //     currentImageSource = imageSource;
+      //   });
+      // }
     }
   }
 
+  // Future<void> _cropImage1() async {
+  //   final scale = cropKey.currentState.scale;
+  //   final area = cropKey.currentState.area;
+  //   if (area == null) {
+  //     // cannot crop, widget is not setup
+  //     return;
+  //   }
+
+  //   // scale up to use maximum possible number of pixels
+  //   // this will sample image in higher resolution to make cropped image larger
+  //   // final sampledFile = await ImageCrop.sampleImage(
+  //   //   file: imageFile,
+  //   //   preferredSize: (2048 / scale).round(),
+  //   // );
+  //   final sampledFile = await ImageCrop.sampleImage(
+  //     file: imageFile,
+  //     preferredWidth: (2048 / scale).round(),
+  //     preferredHeight: (4096 / scale).round(),
+  //   );
+
+  //   final croppedFile = await ImageCrop.cropImage(
+  //     file: sampledFile,
+  //     area: area,
+  //   );
+
+  //   sampledFile.delete();
+
+  //   if (croppedFile != null) {
+  //     imageFile = croppedFile;
+  //     await _editImage();
+  //     // setState(() {
+  //     //   state = AppState.cropped;
+  //     // });
+  //   }
+  // }
+
   Future<void> _cropImage() async {
-    final scale = cropKey.currentState.scale;
-    final area = cropKey.currentState.area;
-    if (area == null) {
-      // cannot crop, widget is not setup
-      return;
-    }
-
-    // scale up to use maximum possible number of pixels
-    // this will sample image in higher resolution to make cropped image larger
-    // final sampledFile = await ImageCrop.sampleImage(
-    //   file: imageFile,
-    //   preferredSize: (2048 / scale).round(),
-    // );
-    final sampledFile = await ImageCrop.sampleImage(
-      file: imageFile,
-      preferredWidth: (2048 / scale).round(),
-      preferredHeight: (4096 / scale).round(),
-    );
-
-    final croppedFile = await ImageCrop.cropImage(
-      file: sampledFile,
-      area: area,
-    );
-
-    sampledFile.delete();
+    File croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFile.path,
+        aspectRatioPresets: Platform.isAndroid
+            ? [
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio16x9
+              ]
+            : [
+                CropAspectRatioPreset.original,
+                CropAspectRatioPreset.square,
+                CropAspectRatioPreset.ratio3x2,
+                CropAspectRatioPreset.ratio4x3,
+                CropAspectRatioPreset.ratio5x3,
+                CropAspectRatioPreset.ratio5x4,
+                CropAspectRatioPreset.ratio7x5,
+                CropAspectRatioPreset.ratio16x9
+              ],
+        androidUiSettings: AndroidUiSettings(
+            toolbarTitle: 'ScanKar - Crop',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        iosUiSettings: IOSUiSettings(
+          title: 'ScanKar - Crop',
+        ));
 
     if (croppedFile != null) {
       imageFile = croppedFile;
       await _editImage();
-      // setState(() {
-      //   state = AppState.cropped;
-      // });
+      setState(() {
+        imageFile = croppedFile;
+        // state = AppState.cropped;
+      });
     }
   }
 
@@ -372,10 +430,11 @@ class _ScanPageState extends State<ScanPage> {
       body: Center(
         child: imageFile != null
             ? RepaintBoundary(
+                child: Image.file(imageFile),
                 // key: _globalKey,
-                child: state == AppState.picked
-                    ? Crop.file(imageFile, key: cropKey)
-                    : Image.file(imageFile),
+                // child: state == AppState.picked
+                //     ? Crop.file(imageFile, key: cropKey)
+                //     : Image.file(imageFile),
               )
             : Container(
                 width: MediaQuery.of(context).size.width / 1.2,

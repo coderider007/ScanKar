@@ -30,8 +30,9 @@ dependencies:
   # cupertino_icons: ^0.1.3
   image: ^2.1.14
   image_picker: ^0.6.7+4
-  edge_detection: ^1.0.5
-  image_crop: ^0.3.2
+  # edge_detection: ^1.0.5
+  # image_crop: ^0.3.2
+  image_cropper: ^1.3.1
   photofilters: ^2.0.1
   permission_handler: ^5.0.1+1
   path_provider: ^1.6.11
